@@ -462,6 +462,9 @@ definitions:
         format: "double"
       iconPath:
         type: "string"
+      status:
+        type: "number"
+        format: "int64"
   
   ThingPropertyAndMetrics:
     type: "object"
@@ -485,6 +488,9 @@ definitions:
         format: "double"
       iconPath:
         type: "string"
+      status:
+        type: "number"
+        format: "int64"
       metrics:
         type: "array"
         items:
