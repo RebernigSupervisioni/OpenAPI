@@ -17,6 +17,12 @@ tags:
   description: "Plants Manage"
 - name: "things"
   description: "Things Manage"
+- name: "things metric"
+  description: "Metric thing manage"
+- name: "things metric history"
+  description: "Metric history thing"
+- name: "things alarm"
+  description: "Alarm thing manage"
 schemes:
 - "https"
 securityDefinitions:
@@ -98,7 +104,7 @@ paths:
       - Bearer: []
       tags:
       - "user"
-      summary: "Login"
+      summary: "Change the user password"
       description: ""
       operationId: "changePassword"
       produces:
@@ -126,7 +132,7 @@ paths:
       - Bearer: []
       tags:
       - "user"
-      summary: "Get user by user name"
+      summary: "Get user's info by user name"
       description: ""
       operationId: "getUserByName"
       produces:
@@ -154,7 +160,7 @@ paths:
       - Bearer: []
       tags:
       - "plants"
-      summary: "Return a list of all plant for a specific user"
+      summary: "Return a list of all plants for a specific user"
       responses:
         200:
           description: "The plants"
@@ -229,13 +235,78 @@ paths:
           description: "Forbidden to requested domain, if any"
         500:
           description: "Some errors occurred, check error message"
+  /things:
+    post:
+      security:
+      - Bearer: []
+      tags:
+      - "things"
+      summary: "Create a new Thing"
+      description: ""
+      produces:
+      - "application/json"
+      parameters:
+      - name: plantid
+        in: query
+        description: "The id of the plant where is the thing"
+        required: true
+        type: string
+      - in: body
+        name: newThings
+        description: "New thing's properties"
+        schema:
+          $ref: "#/definitions/ThingPropertyNoId"
+      responses:
+        200:
+          description: "The id of the new things"
+          schema:
+            $ref: "#/definitions/SimpleResponse"
+        401:
+          description: "Unauthorized (check token, if any)"
+        403:
+          description: "Forbidden"
+        500:
+          description: "Some errors occurred, check error message"
+    get:
+      security:
+      - Bearer: []
+      tags:
+      - "things"
+      summary: "Return all properties and metrics of a list of Things"
+      description: ""
+      operationId: "getThings"
+      produces:
+      - "application/json"
+      parameters:
+        - name: "thingIds"
+          in: "query"
+          description: "The list of thing ids"
+          required: true
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
+      responses:
+        200:
+          description: "The thing details"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/ThingPropertyAndMetrics"
+        401:
+          description: "Unauthorized (check token, if any)"
+        403:
+          description: "Forbidden"
+        500:
+          description: "Some errors occurred, check error message"
+          
   /things/{thingId}:
     get:
       security:
       - Bearer: []
       tags:
       - "things"
-      summary: "Return all metrics of specific thing"
+      summary: "Return all properties and metrics of a specific Thing"
       description: ""
       operationId: "getThing"
       produces:
@@ -254,16 +325,208 @@ paths:
         401:
           description: "Unauthorized (check token, if any)"
         403:
-          description: "Forbidden to requested domain, if any"
+          description: "Forbidden"
         500:
           description: "Some errors occurred, check error message"
+
+    put:
+      security:
+      - Bearer: []
+      tags:
+      - "things"
+      summary: "Modify a Thing's property"
+      description: ""
+      produces:
+      - "application/json"
+      parameters:
+      - name: "thingId"
+        in: "path"
+        description: "The id of the thing"
+        required: true
+        type: "string"
+      - in: body
+        name: newProperty
+        description: "New property"
+        schema:
+          $ref: "#/definitions/SingleProperty"
+      responses:
+        200:
+          description: "Change response"
+          schema:
+            $ref: "#/definitions/SimpleResponse"
+        401:
+          description: "Unauthorized (check token, if any)"
+        403:
+          description: "Forbidden"
+        500:
+          description: "Some errors occurred, check error message"
+    delete:
+      security:
+      - Bearer: []
+      tags:
+      - "things"
+      summary: "Remove a Thing"
+      description: ""
+      operationId: "deleteThing"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "thingId"
+        in: "path"
+        description: "The id of the thing"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "The id of the deleted thing"
+          schema:
+            $ref: "#/definitions/SimpleResponse"
+        401:
+          description: "Unauthorized (check token, if any)"
+        403:
+          description: "Forbidden"
+        500:
+          description: "Some errors occurred, check error message"
+  /things/{thingId}/metrics:
+    get:
+      security:
+      - Bearer: []
+      tags:
+      - "things metric"
+      summary: "Return all metrics of specific thing"
+      description: ""
+      operationId: "getThingMetrics"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "thingId"
+        in: "path"
+        description: "The id of the thing"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "The thing metric details"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Metric"
+        401:
+          description: "Unauthorized (check token, if any)"
+        403:
+          description: "Forbidden"
+        500:
+          description: "Some errors occurred, check error message"
+    post:
+      security:
+      - Bearer: []
+      tags:
+      - "things metric"
+      summary: "Create a new Metric"
+      description: ""
+      produces:
+      - "application/json"
+      parameters:
+      - name: "thingId"
+        in: "path"
+        description: "The id of the thing"
+        required: true
+        type: "string"
+      - in: body
+        name: newMetric
+        description: "New Metric"
+        schema:
+          $ref: "#/definitions/MetricNoId"
+      responses:
+        200:
+          description: "The id of new metric"
+          schema:
+            $ref: "#/definitions/SimpleResponse"
+        401:
+          description: "Unauthorized (check token, if any)"
+        403:
+          description: "Forbidden"
+        500:
+          description: "Some errors occurred, check error message"
+        
+  /things/{thingId}/metrics/{metricId}:
+    put:
+      security:
+      - Bearer: []
+      tags:
+      - "things metric"
+      summary: "Modify a Thing metric"
+      description: ""
+      produces:
+      - "application/json"
+      parameters:
+      - name: "thingId"
+        in: "path"
+        description: "The id of the thing"
+        required: true
+        type: "string"
+      - name: "metricId"
+        in: "path"
+        description: "The id of the metric"
+        required: true
+        type: "string"
+      - in: body
+        name: newProperty
+        description: "New property"
+        schema:
+          $ref: "#/definitions/SingleProperty"
+      responses:
+        200:
+          description: "Change response"
+          schema:
+            $ref: "#/definitions/SimpleResponse"
+        401:
+          description: "Unauthorized (check token, if any)"
+        403:
+          description: "Forbidden"
+        500:
+          description: "Some errors occurred, check error message"
+    delete:
+      security:
+      - Bearer: []
+      tags:
+      - "things metric"
+      summary: "Delete a Thing metric"
+      description: ""
+      produces:
+      - "application/json"
+      parameters:
+      - name: "thingId"
+        in: "path"
+        description: "The id of the thing"
+        required: true
+        type: "string"
+      - name: "metricId"
+        in: "path"
+        description: "The id of the metric"
+        required: true
+        type: "string"
+
+      responses:
+        200:
+          description: "Change response"
+          schema:
+            $ref: "#/definitions/SimpleResponse"
+        401:
+          description: "Unauthorized (check token, if any)"
+        403:
+          description: "Forbidden"
+        500:
+          description: "Some errors occurred, check error message"
+
+      
   /plants/{id}/alarms:
     get:
       security:
       - Bearer: []
       tags:
       - "plants"
-      summary: "Return a list of all the active alert of a plants"
+      summary: "Return a list of all the active alerts of a plant"
       description: ""
       operationId: "getAlarms"
       produces:
@@ -293,7 +556,7 @@ paths:
       - Bearer: []
       tags:
       - "plants"
-      summary: "Returna historical alarm of a specific plants"
+      summary: "Return the historical alarm's list of a specific plant"
       description: ""
       operationId: "getAlarmsHistory"
       consumes:
@@ -305,17 +568,17 @@ paths:
         in: "path"
         description: "The id of the plants"
         required: true
-        type: "string"
+        type: string
       - in: query
         name: from
         required: true
-        description: "start date with format yyyy/MM/dd HH:mm"
-        type: "string"
+        description: "Start date with format yyyy-MM-dd HH:mm"
+        type: string
       - in: query
         name: to
         required: true
-        description: "end date with format yyyy/MM/dd HH:mm"
-        type: "string"
+        description: "End date with format yyyy-MM-dd HH:mm"
+        type: string
       responses:
         200:
           description: "The history for the requested alams"
@@ -329,13 +592,54 @@ paths:
           description: "Forbidden to requested domain, if any"
         500:
           description: "Some errors occurred, check error message"
+  /things/{thingsId}/metricshistory/:
+    get:
+      security:
+      - Bearer: []
+      tags:
+      - "things metric history"
+      summary: "Returns the historical data of a Thing between two dates"
+      description: ""
+      operationId: "getMetricsHistory"
+
+      produces:
+      - "application/json"
+      parameters:
+        - name: thingsId
+          in: path
+          description: "The Id of the thing"
+          required: true
+          type: string
+        - name: from
+          in: query
+          description: "Start date with format yyyy-MM-dd HH:mm"
+          required: true
+          type: string
+        - name: to
+          in: query
+          description: "End date with format yyyy-MM-dd HH:mm"
+          required: true
+          type: string
+      responses:
+        200:
+          description: "The history for the requested metrics"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/MetricSample"
+        401:
+          description: "Unauthorized (check token, if any)"
+        403:
+          description: "Forbidden to requested domain, if any"
+        500:
+          description: "Some errors occurred, check error message"
   /things/{thingId}/alarms:
     get:
       security:
       - Bearer: []
       tags:
-      - "things"
-      summary: "Return all active alarm of a thing"
+      - "things alarm"
+      summary: "Return all active alarms of a thing"
       description: ""
       operationId: "getItemAlarms"
       produces:
@@ -343,7 +647,7 @@ paths:
       parameters:
       - name: "thingId"
         in: "path"
-        description: "L'id dell'item di cui si chiedono gli allarmi"
+        description: "The id of the Thing for which the alarms are requested"
         required: true
         type: "string"
       responses:
@@ -359,45 +663,37 @@ paths:
           description: "Forbidden to requested domain, if any"
         500:
           description: "Some errors occurred, check error message"
-  /things/{thingsId}/metricshistory/:
-    get:
+  /things/{thingId}/alarms/{alarmId}:
+    post:
       security:
       - Bearer: []
       tags:
-      - "things"
-      summary: "Return a storical metric of a thing between two date"
+      - "things alarm"
+      summary: "Ack a specific alarm"
       description: ""
-      operationId: "getMetricsHistory"
-
+      operationId: "AckItemAlarms"
       produces:
       - "application/json"
       parameters:
-        - name: thingsId
-          in: path
-          description: "The Id of the things"
-          required: true
-          type: string
-        - name: from
-          in: query
-          description: "start date with format yyyy/MM/dd HH:mm"
-          required: true
-          type: string
-        - name: to
-          in: query
-          description: "end date with format yyyy/MM/dd HH:mm"
-          required: true
-          type: string
+      - name: "thingId"
+        in: "path"
+        description: "The id of the Thing for which the alarms are requested"
+        required: true
+        type: "string"
+      - name: "alarmId"
+        in: "path"
+        description: "The id of the alarm to acknowledge"
+        required: true
+        type: "string"
       responses:
         200:
-          description: "The history for the requested metrics"
+          description: "The id of acked alarm"
           schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/MetricSample"
+            $ref: "#/definitions/SimpleResponse"
         401:
           description: "Unauthorized (check token, if any)"
         403:
-          description: "Forbidden to requested domain, if any"
+          description: "Forbidden"
         500:
           description: "Some errors occurred, check error message"
 
@@ -440,6 +736,29 @@ definitions:
         type: "number"
         format: "double"
 
+  ThingPropertyNoId:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      description:
+        type: "string"
+      type:
+        type: "string"
+      subtype:
+        type: "string"
+      latitude:
+        type: "number"
+        format: "double"
+      longitude:
+        type: "number"
+        format: "double"
+      iconPath:
+        type: "string"
+      status:
+        type: "number"
+        format: "int64"
+
   ThingProperty:
     type: "object"
     properties:
@@ -465,7 +784,7 @@ definitions:
       status:
         type: "number"
         format: "int64"
-  
+
   ThingPropertyAndMetrics:
     type: "object"
     properties:
@@ -502,6 +821,20 @@ definitions:
       id:
         type: "integer"
         format: "int64"
+      name:
+        type: "string"
+      description:
+        type: "string"
+      value:
+        type: "number"
+      logged:
+        type: "number"
+      aggregFunc:
+        type: "string"
+  
+  MetricNoId:
+    type: "object"
+    properties:
       name:
         type: "string"
       description:
@@ -582,6 +915,9 @@ definitions:
       thingId:
         type: "integer"
         format: "int64"
+      alarmId:
+        type: "integer"
+        format: "int64"
       name:
         type: "string"
       metric:
@@ -602,6 +938,7 @@ definitions:
       id:
         type: "integer"
 
+      
   AccessToken:
     type: "object"
     properties:
