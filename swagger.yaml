@@ -924,10 +924,6 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/MenuIcons"
-      thing:
-        type: "array"
-        items:
-          $ref: "#/definitions/ThingId"
       properties:
         type: "array"
         items:
