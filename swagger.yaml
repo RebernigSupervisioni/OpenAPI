@@ -1,991 +1,1064 @@
-swagger: "2.0"
+openapi: 3.0.1
 info:
-  description: "Rebernig Supervisioni API"
-  version: "1.0.1"
-  title: "Api Provider"
-  termsOfService: "http://swagger.io/terms/"
+  title: Api Provider
+  description: Rebernig Supervisioni API
+  termsOfService: http://swagger.io/terms/
   contact:
-    email: "support@rebernig.it"
+    email: support@rebernig.it
   license:
-    name: "Apache 2.0"
-    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-basePath: "/rest"
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.1
+servers:
+- url: /rest
 tags:
-- name: "user"
-  description: "User Manage"
-- name: "plants"
-  description: "Plants Manage"
-- name: "things"
-  description: "Things Manage"
-- name: "things metric"
-  description: "Metric thing manage"
-- name: "things metric history"
-  description: "Metric history thing"
-- name: "things alarm"
-  description: "Alarm thing manage"
-schemes:
-- "https"
-securityDefinitions:
-  Bearer:
-    type: apiKey
-    name: Authorization
-    in: header
-      
+- name: user
+  description: User Manage
+- name: plants
+  description: Plants Manage
+- name: things
+  description: Things Manage
+- name: things metric
+  description: Metric thing manage
+- name: things metric history
+  description: Metric history thing
+- name: things alarm
+  description: Alarm thing manage
 paths:
   /user/login:
     post:
       tags:
-      - "user"
-      summary: "Login"
-      consumes:
-        - application/json
-      parameters:
-        - in: body
-          name: userdata
-          description: "Username and password to verify"
-          schema:
-            $ref: '#/definitions/UserLogin'
+      - user
+      summary: Login
+      requestBody:
+        description: Username and password to verify
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+        required: false
       responses:
         200:
-          description: "The token"
-          schema:
-            $ref: "#/definitions/AccessToken"
+          description: The token
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AccessToken'
         401:
-          description: "Unauthorized (check token, if any)"
+          description: Unauthorized (check token, if any)
+          content: {}
         403:
-          description: "Forbidden to requested domain, if any"
+          description: Forbidden to requested domain, if any
+          content: {}
         500:
-          description: "Some errors occurred, check error message"
+          description: Some errors occurred, check error message
+          content: {}
+      x-codegen-request-body-name: userdata
   /user/refreshToken:
     get:
-      security:
-      - Bearer: []
       tags:
-      - "user"
-      summary: "Refresh of the authorization token"
+      - user
+      summary: Refresh of the authorization token
       responses:
         200:
-          description: "The token"
-          schema:
-            $ref: "#/definitions/AccessToken"
+          description: The token
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AccessToken'
         401:
-          description: "Unauthorized (check token, if any)"
+          description: Unauthorized (check token, if any)
+          content: {}
         403:
-          description: "Forbidden to requested domain, if any"
+          description: Forbidden to requested domain, if any
+          content: {}
         500:
-          description: "Some errors occurred, check error message"
+          description: Some errors occurred, check error message
+          content: {}
+      security:
+      - Bearer: []
   /user/logout:
     get:
-      security:
-      - Bearer: []
       tags:
-      - "user"
-      summary: "Logout"
-      description: ""
-      operationId: "logoutUser"
-      produces:
-      - "application/xml"
-      - "application/json"
-      parameters: []
+      - user
+      summary: Logout
+      operationId: logoutUser
       responses:
         200:
-          description: "Logout response"
-          schema:
-            $ref: "#/definitions/SimpleResponse"
+          description: Logout response
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/SimpleResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleResponse'
         401:
-          description: "Unauthorized (check token, if any)"
+          description: Unauthorized (check token, if any)
+          content: {}
         403:
-          description: "Forbidden to requested domain, if any"
+          description: Forbidden to requested domain, if any
+          content: {}
         500:
-          description: "Some errors occurred, check error message"
+          description: Some errors occurred, check error message
+          content: {}
+      security:
+      - Bearer: []
   /user/changePassword:
     post:
-      security:
-      - Bearer: []
       tags:
-      - "user"
-      summary: "Change the user password"
-      description: ""
-      operationId: "changePassword"
-      produces:
-      - "application/json"
-      parameters:
-      - in: body
-        name: newPasswordData
-        description: "Old and new password"
-        schema:
-          $ref: '#/definitions/NewPasswordData'
+      - user
+      summary: Change the user password
+      operationId: changePassword
+      requestBody:
+        description: Old and new password
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/NewPasswordData'
+        required: false
       responses:
         200:
-          description: "Change response"
-          schema:
-            $ref: "#/definitions/SimpleResponse"
+          description: Change response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleResponse'
         401:
-          description: "Unauthorized (check token, if any)"
+          description: Unauthorized (check token, if any)
+          content: {}
         403:
-          description: "Forbidden to requested domain, if any"
+          description: Forbidden to requested domain, if any
+          content: {}
         500:
-          description: "Some errors occurred, check error message"
+          description: Some errors occurred, check error message
+          content: {}
+      security:
+      - Bearer: []
+      x-codegen-request-body-name: newPasswordData
   /user/{username}:
     get:
-      security:
-      - Bearer: []
       tags:
-      - "user"
-      summary: "Get user's info by user name"
-      description: ""
-      operationId: "getUserByName"
-      produces:
-      - "application/json"
+      - user
+      summary: Get user's info by user name
+      operationId: getUserByName
       parameters:
-      - name: "username"
-        in: "path"
-        description: "The name that needs to be fetched"
+      - name: username
+        in: path
+        description: The name that needs to be fetched
         required: true
-        type: "string"
+        schema:
+          type: string
       responses:
         200:
-          description: "The user"
-          schema:
-            $ref: "#/definitions/User"
+          description: The user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
         401:
-          description: "Unauthorized (check token, if any)"
+          description: Unauthorized (check token, if any)
+          content: {}
         403:
-          description: "Forbidden to requested domain, if any"
+          description: Forbidden to requested domain, if any
+          content: {}
         500:
-          description: "Some errors occurred, check error message"
+          description: Some errors occurred, check error message
+          content: {}
+      security:
+      - Bearer: []
   /plants/list:
     get:
-      security:
-      - Bearer: []
       tags:
-      - "plants"
-      summary: "Return a list of all plants for a specific user"
+      - plants
+      summary: Return a list of all plants for a specific user
       responses:
         200:
-          description: "The plants"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Plants"
+          description: The plants
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Plants'
         401:
-          description: "Unauthorized (check token, if any)"
+          description: Unauthorized (check token, if any)
+          content: {}
         403:
-          description: "Forbidden to requested domain, if any"
+          description: Forbidden to requested domain, if any
+          content: {}
         500:
-          description: "Some errors occurred, check error message"
+          description: Some errors occurred, check error message
+          content: {}
+      security:
+      - Bearer: []
   /plants/{id}/properties:
     get:
-      security:
-      - Bearer: []
       tags:
-      - "plants"
-      summary: "Return the properties (pairs key/value) of a specific plant"
-      description: ""
-      operationId: "getPlantProperties"
-      produces:
-      - "application/json"
+      - plants
+      summary: Return the properties (pairs key/value) of a specific plant
+      operationId: getPlantProperties
       parameters:
-      - name: "id"
-        in: "path"
-        description: "The plant id"
+      - name: id
+        in: path
+        description: The plant id
         required: true
-        type: "string"
+        schema:
+          type: string
       responses:
         200:
-          description: "The properties"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/PlantProperty"
+          description: The properties
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlantProperty'
         401:
-          description: "Unauthorized (check token, if any)"
+          description: Unauthorized (check token, if any)
+          content: {}
         403:
-          description: "Forbidden to requested domain, if any"
+          description: Forbidden to requested domain, if any
+          content: {}
         500:
-          description: "Some errors occurred, check error message"
-
+          description: Some errors occurred, check error message
+          content: {}
+      security:
+      - Bearer: []
   /plants/{id}/things:
     get:
-      security:
-      - Bearer: []
       tags:
-      - "plants"
-      summary: "Return a list of all things of specific plant"
-      description: ""
-      operationId: "getPlantThings"
-      produces:
-      - "application/json"
+      - plants
+      summary: Return a list of all things of specific plant
+      operationId: getPlantThings
       parameters:
-      - name: "id"
-        in: "path"
-        description: "The id of the plant"
+      - name: id
+        in: path
+        description: The id of the plant
         required: true
-        type: "string"
+        schema:
+          type: string
       responses:
         200:
-          description: "The plants things"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/ThingProperty"
+          description: The plants things
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ThingProperty'
         401:
-          description: "Unauthorized (check token, if any)"
+          description: Unauthorized (check token, if any)
+          content: {}
         403:
-          description: "Forbidden to requested domain, if any"
+          description: Forbidden to requested domain, if any
+          content: {}
         500:
-          description: "Some errors occurred, check error message"
-  /things:
-    post:
+          description: Some errors occurred, check error message
+          content: {}
       security:
       - Bearer: []
+  /things:
+    get:
       tags:
-      - "things"
-      summary: "Create a new Thing"
-      description: ""
-      produces:
-      - "application/json"
+      - things
+      summary: Return all properties and metrics of a list of Things
+      operationId: getThings
+      parameters:
+      - name: thingIds
+        in: query
+        description: The list of thing ids
+        required: true
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: The thing details
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ThingPropertyAndMetrics'
+        401:
+          description: Unauthorized (check token, if any)
+          content: {}
+        403:
+          description: Forbidden
+          content: {}
+        500:
+          description: Some errors occurred, check error message
+          content: {}
+      security:
+      - Bearer: []
+    post:
+      tags:
+      - things
+      summary: Create a new Thing
       parameters:
       - name: plantid
         in: query
-        description: "The id of the plant where is the thing"
+        description: The id of the plant where is the thing
         required: true
-        type: string
-      - in: body
-        name: newThings
-        description: "New thing's properties"
         schema:
-          $ref: "#/definitions/ThingPropertyNoId"
+          type: string
+      requestBody:
+        description: New thing's properties
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/ThingPropertyNoId'
+        required: false
       responses:
         200:
-          description: "The id of the new things"
-          schema:
-            $ref: "#/definitions/SimpleResponse"
+          description: The id of the new things
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleResponse'
         401:
-          description: "Unauthorized (check token, if any)"
+          description: Unauthorized (check token, if any)
+          content: {}
         403:
-          description: "Forbidden"
+          description: Forbidden
+          content: {}
         500:
-          description: "Some errors occurred, check error message"
-    get:
+          description: Some errors occurred, check error message
+          content: {}
       security:
       - Bearer: []
-      tags:
-      - "things"
-      summary: "Return all properties and metrics of a list of Things"
-      description: ""
-      operationId: "getThings"
-      produces:
-      - "application/json"
-      parameters:
-        - name: "thingIds"
-          in: "query"
-          description: "The list of thing ids"
-          required: true
-          type: "array"
-          items:
-            type: "integer"
-            format: "int64"
-      responses:
-        200:
-          description: "The thing details"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/ThingPropertyAndMetrics"
-        401:
-          description: "Unauthorized (check token, if any)"
-        403:
-          description: "Forbidden"
-        500:
-          description: "Some errors occurred, check error message"
-          
+      x-codegen-request-body-name: newThings
   /things/{thingId}:
     get:
-      security:
-      - Bearer: []
       tags:
-      - "things"
-      summary: "Return all properties and metrics of a specific Thing"
-      description: ""
-      operationId: "getThing"
-      produces:
-      - "application/json"
+      - things
+      summary: Return all properties and metrics of a specific Thing
+      operationId: getThing
       parameters:
-      - name: "thingId"
-        in: "path"
-        description: "The id of the thing"
+      - name: thingId
+        in: path
+        description: The id of the thing
         required: true
-        type: "string"
-      responses:
-        200:
-          description: "The thing details"
-          schema:
-              $ref: "#/definitions/ThingPropertyAndMetrics"
-        401:
-          description: "Unauthorized (check token, if any)"
-        403:
-          description: "Forbidden"
-        500:
-          description: "Some errors occurred, check error message"
-
-    put:
-      security:
-      - Bearer: []
-      tags:
-      - "things"
-      summary: "Modify a Thing's property"
-      description: ""
-      produces:
-      - "application/json"
-      parameters:
-      - name: "thingId"
-        in: "path"
-        description: "The id of the thing"
-        required: true
-        type: "string"
-      - in: body
-        name: newProperty
-        description: "New property"
         schema:
-          $ref: "#/definitions/SingleProperty"
+          type: string
       responses:
         200:
-          description: "Change response"
-          schema:
-            $ref: "#/definitions/SimpleResponse"
+          description: The thing details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThingPropertyAndMetrics'
         401:
-          description: "Unauthorized (check token, if any)"
+          description: Unauthorized (check token, if any)
+          content: {}
         403:
-          description: "Forbidden"
+          description: Forbidden
+          content: {}
         500:
-          description: "Some errors occurred, check error message"
-    delete:
+          description: Some errors occurred, check error message
+          content: {}
       security:
       - Bearer: []
+    put:
       tags:
-      - "things"
-      summary: "Remove a Thing"
-      description: ""
-      operationId: "deleteThing"
-      produces:
-      - "application/json"
+      - things
+      summary: Modify a Thing's property
       parameters:
-      - name: "thingId"
-        in: "path"
-        description: "The id of the thing"
+      - name: thingId
+        in: path
+        description: The id of the thing
         required: true
-        type: "string"
+        schema:
+          type: string
+      requestBody:
+        description: New property
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/SingleProperty'
+        required: false
       responses:
         200:
-          description: "The id of the deleted thing"
-          schema:
-            $ref: "#/definitions/SimpleResponse"
+          description: Change response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleResponse'
         401:
-          description: "Unauthorized (check token, if any)"
+          description: Unauthorized (check token, if any)
+          content: {}
         403:
-          description: "Forbidden"
+          description: Forbidden
+          content: {}
         500:
-          description: "Some errors occurred, check error message"
+          description: Some errors occurred, check error message
+          content: {}
+      security:
+      - Bearer: []
+      x-codegen-request-body-name: newProperty
+    delete:
+      tags:
+      - things
+      summary: Remove a Thing
+      operationId: deleteThing
+      parameters:
+      - name: thingId
+        in: path
+        description: The id of the thing
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: The id of the deleted thing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleResponse'
+        401:
+          description: Unauthorized (check token, if any)
+          content: {}
+        403:
+          description: Forbidden
+          content: {}
+        500:
+          description: Some errors occurred, check error message
+          content: {}
+      security:
+      - Bearer: []
   /things/{thingId}/metrics:
     get:
-      security:
-      - Bearer: []
       tags:
-      - "things metric"
-      summary: "Return all metrics of specific thing"
-      description: ""
-      operationId: "getThingMetrics"
-      produces:
-      - "application/json"
+      - things metric
+      summary: Return all metrics of specific thing
+      operationId: getThingMetrics
       parameters:
-      - name: "thingId"
-        in: "path"
-        description: "The id of the thing"
+      - name: thingId
+        in: path
+        description: The id of the thing
         required: true
-        type: "string"
-      responses:
-        200:
-          description: "The thing metric details"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Metric"
-        401:
-          description: "Unauthorized (check token, if any)"
-        403:
-          description: "Forbidden"
-        500:
-          description: "Some errors occurred, check error message"
-    post:
-      security:
-      - Bearer: []
-      tags:
-      - "things metric"
-      summary: "Create a new Metric"
-      description: ""
-      produces:
-      - "application/json"
-      parameters:
-      - name: "thingId"
-        in: "path"
-        description: "The id of the thing"
-        required: true
-        type: "string"
-      - in: body
-        name: newMetric
-        description: "New Metric"
         schema:
-          $ref: "#/definitions/MetricNoId"
+          type: string
       responses:
         200:
-          description: "The id of new metric"
-          schema:
-            $ref: "#/definitions/SimpleResponse"
+          description: The thing metric details
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Metric'
         401:
-          description: "Unauthorized (check token, if any)"
+          description: Unauthorized (check token, if any)
+          content: {}
         403:
-          description: "Forbidden"
+          description: Forbidden
+          content: {}
         500:
-          description: "Some errors occurred, check error message"
-        
+          description: Some errors occurred, check error message
+          content: {}
+      security:
+      - Bearer: []
+    post:
+      tags:
+      - things metric
+      summary: Create a new Metric
+      parameters:
+      - name: thingId
+        in: path
+        description: The id of the thing
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: New Metric
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/MetricNoId'
+        required: false
+      responses:
+        200:
+          description: The id of new metric
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleResponse'
+        401:
+          description: Unauthorized (check token, if any)
+          content: {}
+        403:
+          description: Forbidden
+          content: {}
+        500:
+          description: Some errors occurred, check error message
+          content: {}
+      security:
+      - Bearer: []
+      x-codegen-request-body-name: newMetric
   /things/{thingId}/metrics/{metricId}:
     put:
-      security:
-      - Bearer: []
       tags:
-      - "things metric"
-      summary: "Modify a Thing metric"
-      description: ""
-      produces:
-      - "application/json"
+      - things metric
+      summary: Modify a Thing metric
       parameters:
-      - name: "thingId"
-        in: "path"
-        description: "The id of the thing"
+      - name: thingId
+        in: path
+        description: The id of the thing
         required: true
-        type: "string"
-      - name: "metricId"
-        in: "path"
-        description: "The id of the metric"
-        required: true
-        type: "string"
-      - in: body
-        name: newProperty
-        description: "New property"
         schema:
-          $ref: "#/definitions/SingleProperty"
+          type: string
+      - name: metricId
+        in: path
+        description: The id of the metric
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: New property
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/SingleProperty'
+        required: false
       responses:
         200:
-          description: "Change response"
-          schema:
-            $ref: "#/definitions/SimpleResponse"
+          description: Change response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleResponse'
         401:
-          description: "Unauthorized (check token, if any)"
+          description: Unauthorized (check token, if any)
+          content: {}
         403:
-          description: "Forbidden"
+          description: Forbidden
+          content: {}
         500:
-          description: "Some errors occurred, check error message"
-    delete:
+          description: Some errors occurred, check error message
+          content: {}
       security:
       - Bearer: []
+      x-codegen-request-body-name: newProperty
+    delete:
       tags:
-      - "things metric"
-      summary: "Delete a Thing metric"
-      description: ""
-      produces:
-      - "application/json"
+      - things metric
+      summary: Delete a Thing metric
       parameters:
-      - name: "thingId"
-        in: "path"
-        description: "The id of the thing"
+      - name: thingId
+        in: path
+        description: The id of the thing
         required: true
-        type: "string"
-      - name: "metricId"
-        in: "path"
-        description: "The id of the metric"
+        schema:
+          type: string
+      - name: metricId
+        in: path
+        description: The id of the metric
         required: true
-        type: "string"
-
+        schema:
+          type: string
       responses:
         200:
-          description: "Change response"
-          schema:
-            $ref: "#/definitions/SimpleResponse"
+          description: Change response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleResponse'
         401:
-          description: "Unauthorized (check token, if any)"
+          description: Unauthorized (check token, if any)
+          content: {}
         403:
-          description: "Forbidden"
+          description: Forbidden
+          content: {}
         500:
-          description: "Some errors occurred, check error message"
-
-      
+          description: Some errors occurred, check error message
+          content: {}
+      security:
+      - Bearer: []
   /plants/{id}/alarms:
     get:
-      security:
-      - Bearer: []
       tags:
-      - "plants"
-      summary: "Return a list of all the active alerts of a plant"
-      description: ""
-      operationId: "getAlarms"
-      produces:
-      - "application/json"
+      - plants
+      summary: Return a list of all the active alerts of a plant
+      operationId: getAlarms
       parameters:
-      - name: "id"
-        in: "path"
-        description: "The id of the plant"
+      - name: id
+        in: path
+        description: The id of the plant
         required: true
-        type: "string"
+        schema:
+          type: string
       responses:
         200:
-          description: "Current alarms"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Alarm"
+          description: Current alarms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Alarm'
         401:
-          description: "Unauthorized (check token, if any)"
+          description: Unauthorized (check token, if any)
+          content: {}
         403:
-          description: "Forbidden to requested domain, if any"
+          description: Forbidden to requested domain, if any
+          content: {}
         500:
-          description: "Some errors occurred, check error message"
+          description: Some errors occurred, check error message
+          content: {}
+      security:
+      - Bearer: []
   /plants/{id}/alarmshistory:
     get:
-      security:
-      - Bearer: []
       tags:
-      - "plants"
-      summary: "Return the historical alarm's list of a specific plant"
-      description: ""
-      operationId: "getAlarmsHistory"
-      consumes:
-        - application/json
-      produces:
-      - "application/json"
+      - plants
+      summary: Return the historical alarm's list of a specific plant
+      operationId: getAlarmsHistory
       parameters:
-      - name: "id"
-        in: "path"
-        description: "The id of the plants"
+      - name: id
+        in: path
+        description: The id of the plants
         required: true
-        type: string
-      - in: query
-        name: from
+        schema:
+          type: string
+      - name: from
+        in: query
+        description: Start date with format yyyy-MM-dd HH:mm
         required: true
-        description: "Start date with format yyyy-MM-dd HH:mm"
-        type: string
-      - in: query
-        name: to
+        schema:
+          type: string
+      - name: to
+        in: query
+        description: End date with format yyyy-MM-dd HH:mm
         required: true
-        description: "End date with format yyyy-MM-dd HH:mm"
-        type: string
+        schema:
+          type: string
       responses:
         200:
-          description: "The alarm history for the requested plant"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/AlarmSample"
+          description: The alarm history for the requested plant
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AlarmSample'
         401:
-          description: "Unauthorized (check token, if any)"
+          description: Unauthorized (check token, if any)
+          content: {}
         403:
-          description: "Forbidden to requested domain, if any"
+          description: Forbidden to requested domain, if any
+          content: {}
         500:
-          description: "Some errors occurred, check error message"
+          description: Some errors occurred, check error message
+          content: {}
+      security:
+      - Bearer: []
   /things/{thingsId}/metricshistory:
     get:
-      security:
-      - Bearer: []
       tags:
-      - "things metric history"
-      summary: "Returns the historical data of a Thing between two dates"
-      description: ""
-      operationId: "getMetricsHistory"
-
-      produces:
-      - "application/json"
+      - things metric history
+      summary: Returns the historical data of a Thing between two dates
+      operationId: getMetricsHistory
       parameters:
-        - name: thingsId
-          in: path
-          description: "The Id of the thing"
-          required: true
+      - name: thingsId
+        in: path
+        description: The Id of the thing
+        required: true
+        schema:
           type: string
-        - name: from
-          in: query
-          description: "Start date with format yyyy-MM-dd HH:mm"
-          required: true
+      - name: from
+        in: query
+        description: Start date with format yyyy-MM-dd HH:mm
+        required: true
+        schema:
           type: string
-        - name: to
-          in: query
-          description: "End date with format yyyy-MM-dd HH:mm"
-          required: true
+      - name: to
+        in: query
+        description: End date with format yyyy-MM-dd HH:mm
+        required: true
+        schema:
           type: string
       responses:
         200:
-          description: "The history for the requested metrics"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/MetricSample"
+          description: The history for the requested metrics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MetricSample'
         401:
-          description: "Unauthorized (check token, if any)"
+          description: Unauthorized (check token, if any)
+          content: {}
         403:
-          description: "Forbidden to requested domain, if any"
+          description: Forbidden to requested domain, if any
+          content: {}
         500:
-          description: "Some errors occurred, check error message"
-
+          description: Some errors occurred, check error message
+          content: {}
+      security:
+      - Bearer: []
   /things/{thingId}/alarmshistory:
     get:
-      security:
-      - Bearer: []
       tags:
-      - "things alarm"
-      summary: "Return the historical alarm's list of a specific Thing"
-      description: ""
-      operationId: "getThingAlarmsHistory"
-      consumes:
-        - application/json
-      produces:
-      - "application/json"
+      - things alarm
+      summary: Return the historical alarm's list of a specific Thing
+      operationId: getThingAlarmsHistory
       parameters:
-      - name: "thingId"
-        in: "path"
-        description: "The id of the Thing"
+      - name: thingId
+        in: path
+        description: The id of the Thing
         required: true
-        type: string
-      - in: query
-        name: from
+        schema:
+          type: string
+      - name: from
+        in: query
+        description: Start date with format yyyy-MM-dd HH:mm
         required: true
-        description: "Start date with format yyyy-MM-dd HH:mm"
-        type: string
-      - in: query
-        name: to
+        schema:
+          type: string
+      - name: to
+        in: query
+        description: End date with format yyyy-MM-dd HH:mm
         required: true
-        description: "End date with format yyyy-MM-dd HH:mm"
-        type: string
+        schema:
+          type: string
       responses:
         200:
-          description: "The alarm history for the requested Thing"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/AlarmSample"
+          description: The alarm history for the requested Thing
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AlarmSample'
         401:
-          description: "Unauthorized (check token, if any)"
+          description: Unauthorized (check token, if any)
+          content: {}
         403:
-          description: "Forbidden to requested domain, if any"
+          description: Forbidden to requested domain, if any
+          content: {}
         500:
-          description: "Some errors occurred, check error message"
-          
+          description: Some errors occurred, check error message
+          content: {}
+      security:
+      - Bearer: []
   /things/{thingId}/alarms:
     get:
-      security:
-      - Bearer: []
       tags:
-      - "things alarm"
-      summary: "Return all active alarms of a thing"
-      description: ""
-      operationId: "getItemAlarms"
-      produces:
-      - "application/json"
+      - things alarm
+      summary: Return all active alarms of a thing
+      operationId: getItemAlarms
       parameters:
-      - name: "thingId"
-        in: "path"
-        description: "The id of the Thing for which the alarms are requested"
+      - name: thingId
+        in: path
+        description: The id of the Thing for which the alarms are requested
         required: true
-        type: "string"
+        schema:
+          type: string
       responses:
         200:
-          description: "Current alarms"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Alarm"
+          description: Current alarms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Alarm'
         401:
-          description: "Unauthorized (check token, if any)"
+          description: Unauthorized (check token, if any)
+          content: {}
         403:
-          description: "Forbidden to requested domain, if any"
+          description: Forbidden to requested domain, if any
+          content: {}
         500:
-          description: "Some errors occurred, check error message"
+          description: Some errors occurred, check error message
+          content: {}
+      security:
+      - Bearer: []
   /things/{thingId}/alarms/{alarmId}:
     post:
-      security:
-      - Bearer: []
       tags:
-      - "things alarm"
-      summary: "Ack a specific alarm"
-      description: ""
-      operationId: "AckItemAlarms"
-      produces:
-      - "application/json"
+      - things alarm
+      summary: Ack a specific alarm
+      operationId: AckItemAlarms
       parameters:
-      - name: "thingId"
-        in: "path"
-        description: "The id of the Thing for which the alarms are requested"
+      - name: thingId
+        in: path
+        description: The id of the Thing for which the alarms are requested
         required: true
-        type: "string"
-      - name: "alarmId"
-        in: "path"
-        description: "The id of the alarm to acknowledge"
+        schema:
+          type: string
+      - name: alarmId
+        in: path
+        description: The id of the alarm to acknowledge
         required: true
-        type: "string"
+        schema:
+          type: string
       responses:
         200:
-          description: "The id of acked alarm"
-          schema:
-            $ref: "#/definitions/SimpleResponse"
+          description: The id of acked alarm
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleResponse'
         401:
-          description: "Unauthorized (check token, if any)"
+          description: Unauthorized (check token, if any)
+          content: {}
         403:
-          description: "Forbidden"
+          description: Forbidden
+          content: {}
         500:
-          description: "Some errors occurred, check error message"
-
-
-definitions:
-  UserLogin:
-    type: "object"
-    properties:
-      username:
-        type: "string"
-      password:
-        type: "string"
-  User:
-    type: "object"
-    properties:
-      username:
-        type: "string"
-      firstName:
-        type: "string"
-      lastName:
-        type: "string"
-      roles:
-        type: "string"
-      emails:
-        type: "string"
-  Plants:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-      name:
-        type: "string"
-      logo:
-        type: "string"
-      latitude:
-        type: "number"
-        format: "double"
-      longitude:
-        type: "number"
-        format: "double"
-
-  ThingPropertyNoId:
-    type: "object"
-    properties:
-      name:
-        type: "string"
-      description:
-        type: "string"
-      type:
-        type: "string"
-      subtype:
-        type: "string"
-      latitude:
-        type: "number"
-        format: "double"
-      longitude:
-        type: "number"
-        format: "double"
-      iconPath:
-        type: "string"
-      status:
-        type: "number"
-        format: "int64"
-
-  ThingProperty:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-      name:
-        type: "string"
-      description:
-        type: "string"
-      type:
-        type: "string"
-      subtype:
-        type: "string"
-      latitude:
-        type: "number"
-        format: "double"
-      longitude:
-        type: "number"
-        format: "double"
-      iconPath:
-        type: "string"
-      status:
-        type: "number"
-        format: "int64"
-
-  ThingPropertyAndMetrics:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-      name:
-        type: "string"
-      description:
-        type: "string"
-      type:
-        type: "string"
-      subtype:
-        type: "string"
-      latitude:
-        type: "number"
-        format: "double"
-      longitude:
-        type: "number"
-        format: "double"
-      iconPath:
-        type: "string"
-      status:
-        type: "number"
-        format: "int64"
-      metrics:
-        type: "array"
-        items:
-          $ref: "#/definitions/Metric"
-
-  Metric:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-      name:
-        type: "string"
-      description:
-        type: "string"
-      value:
-        type: "number"
-      logged:
-        type: "number"
-      aggregFunc:
-        type: "string"
-  
-  MetricNoId:
-    type: "object"
-    properties:
-      name:
-        type: "string"
-      description:
-        type: "string"
-      value:
-        type: "number"
-      logged:
-        type: "number"
-      aggregFunc:
-        type: "string"
-
-  MetricSample:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-      date:
-        type: "string"
-      value:
-        type: "number"
-  AlarmSample:
-    type: "object"
-    properties:
-      metricPath:
-        type: "string"
-      name:
-        type: "string"
-      alarmDate:
-        type: "string"
-      priority:
-        type: "string"
-      eventType:
-        type: "string"
-  PlantProperty:
-    type: "object"
-    properties:
-      name:
-        type: "string"
-      logo:
-        type: "string"
-      menuIcons:
-        type: "array"
-        items:
-          $ref: "#/definitions/MenuIcons"
+          description: Some errors occurred, check error message
+          content: {}
+      security:
+      - Bearer: []
+components:
+  schemas:
+    UserLogin:
+      type: object
       properties:
-        type: "array"
-        items:
-          $ref: "#/definitions/SingleProperty"
-  SingleProperty:
-    type: "object"
-    properties:
-      prop:
-        type: "string"
-      val:
-        type: "string"
-  MenuIcons:
-    type: "object"
-    properties:
-      iconLink:
-        type: "string"
-      pageName:
-        type: "string"
-  NewPasswordData:
-    type: "object"
-    properties:
-      oldPassword:
-        type: "string"
-      newPassword:
-        type: "string"
-  Alarm:
-    type: "object"
-    properties:
-      thingId:
-        type: "integer"
-        format: "int64"
-      alarmId:
-        type: "integer"
-        format: "int64"
-      name:
-        type: "string"
-      metric:
-        type: "string"
-      alarmDate:
-        type: "string"
-      priority:
-        type: "string"
-      state:
-        type: "string"
-      value:
-        type: "number"
-        format: "double"
-
-  ThingId:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-
-      
-  AccessToken:
-    type: "object"
-    properties:
-      accessToken:
-        type: "string"
-  SimpleResponse:
-    type: "object"
-    properties:
-      response:
-        type: "string"
+        username:
+          type: string
+        password:
+          type: string
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        roles:
+          type: string
+        emails:
+          type: string
+    Plants:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        logo:
+          type: string
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+    ThingPropertyNoId:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+        subtype:
+          type: string
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        iconPath:
+          type: string
+        status:
+          type: number
+          format: int64
+    ThingProperty:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+        subtype:
+          type: string
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        iconPath:
+          type: string
+        status:
+          type: number
+          format: int64
+    ThingPropertyAndMetrics:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+        subtype:
+          type: string
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        iconPath:
+          type: string
+        status:
+          type: number
+          format: int64
+        metrics:
+          type: array
+          items:
+            $ref: '#/components/schemas/Metric'
+    Metric:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        value:
+          type: number
+        logged:
+          type: number
+        aggregFunc:
+          type: string
+    MetricNoId:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        value:
+          type: number
+        logged:
+          type: number
+        aggregFunc:
+          type: string
+    MetricSample:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        date:
+          type: string
+        value:
+          type: number
+    AlarmSample:
+      type: object
+      properties:
+        metricPath:
+          type: string
+        name:
+          type: string
+        alarmDate:
+          type: string
+        priority:
+          type: string
+        eventType:
+          type: string
+    PlantProperty:
+      type: object
+      properties:
+        name:
+          type: string
+        logo:
+          type: string
+        menuIcons:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenuIcons'
+        properties:
+          type: array
+          items:
+            $ref: '#/components/schemas/SingleProperty'
+    SingleProperty:
+      type: object
+      properties:
+        prop:
+          type: string
+        val:
+          type: string
+    MenuIcons:
+      type: object
+      properties:
+        iconLink:
+          type: string
+        pageName:
+          type: string
+    NewPasswordData:
+      type: object
+      properties:
+        oldPassword:
+          type: string
+        newPassword:
+          type: string
+    Alarm:
+      type: object
+      properties:
+        thingId:
+          type: integer
+          format: int64
+        alarmId:
+          type: integer
+          format: int64
+        name:
+          type: string
+        metric:
+          type: string
+        alarmDate:
+          type: string
+        priority:
+          type: string
+        state:
+          type: string
+        value:
+          type: number
+          format: double
+    ThingId:
+      type: object
+      properties:
+        id:
+          type: integer
+    AccessToken:
+      type: object
+      properties:
+        accessToken:
+          type: string
+    SimpleResponse:
+      type: object
+      properties:
+        response:
+          type: string
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
