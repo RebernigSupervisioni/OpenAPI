@@ -13,17 +13,17 @@ servers:
 - url: /rest
 tags:
 - name: user
-  description: User Manage
+  description: User Management
 - name: plants
-  description: Plants Manage
+  description: Plants Management
 - name: things
-  description: Things Manage
+  description: Things Management
 - name: things metric
-  description: Metric thing manage
+  description: Metric thing Management
 - name: things metric history
   description: Metric history thing
 - name: things alarm
-  description: Alarm thing manage
+  description: Alarm thing Management
 paths:
   /user/login:
     post:
@@ -284,7 +284,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ThingPropertyAndMetrics'
+                  $ref: '#/components/schemas/ThingProperty'
         401:
           description: Unauthorized (check token, if any)
           content: {}
@@ -352,7 +352,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ThingPropertyAndMetrics'
+                $ref: '#/components/schemas/ThingProperty'
         401:
           description: Unauthorized (check token, if any)
           content: {}
