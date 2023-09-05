@@ -14,15 +14,15 @@ servers:
 tags:
 - name: user
   description: User Management
-- name: plant
+- name: plants
   description: Plant Management
-- name: thing
+- name: things
   description: Thing Management
-- name: thing metric
+- name: things metric
   description: Thing Metric Management
-- name: thing metric history
+- name: things metric history
   description: Thing Metric History Management
-- name: thing alarm
+- name: things alarm
   description: Thing Alarm Management
 paths:
   /user/login:
