@@ -262,7 +262,7 @@ paths:
     get:
       tags:
       - things
-      summary: Return all properties and metrics of a list of Things
+      summary: Return all properties of a list of Things
       operationId: getThings
       parameters:
       - name: thingIds
@@ -337,7 +337,7 @@ paths:
     get:
       tags:
       - things
-      summary: Return all properties and metrics of a specific Thing
+      summary: Return all properties of a specific Thing
       operationId: getThing
       parameters:
       - name: thingId
